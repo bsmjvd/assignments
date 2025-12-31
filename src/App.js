@@ -1,21 +1,24 @@
-import React from 'react'
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
+import PostList from './components/PostList';
+import PostDetail from './components/PostDetail';
+import './App.css';
 
-const App = () => {
+function App() {
   return (
     <Router>
       <div className="App">
         <Header />
-        {/* <main className="main-content">
+        <main className="main-content">
           <Routes>
             <Route path="/" element={<PostList />} />
             <Route path="/post/:id" element={<PostDetail />} />
           </Routes>
-        </main> */}
+        </main>
       </div>
     </Router>
   );
 }
 
-export default App
+export default App;
