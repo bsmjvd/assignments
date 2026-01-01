@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PostCard from './PostCard';
 import SearchBar from './SearchBar';
 import Loading from './Loading';
+import AuthorFilter from './AuthorFilter';
 import './PostList.css';
 
 function PostList() {
@@ -10,6 +11,7 @@ function PostList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAuthor, setSelectedAuthor] = useState('');
 
   useEffect(() => {
     // Fetch posts and users
@@ -42,10 +44,12 @@ function PostList() {
     fetchData();
   }, []);
 
-  // Filter posts by search term
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+   // Filter posts by search term and author
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesAuthor = selectedAuthor === '' || post.userId === parseInt(selectedAuthor);
+    return matchesSearch && matchesAuthor;
+  });
 
   // Get user by ID
   const getUserById = (userId) => {
@@ -65,17 +69,33 @@ function PostList() {
     );
   }
 
+  // Get selected author name for display
+  const getSelectedAuthorName = () => {
+    if (!selectedAuthor) return null;
+    const author = users.find(user => user.id === parseInt(selectedAuthor));
+    return author ? author.name : null;
+  };
+
   return (
     <div className="post-list-container">
       <h1 className="page-title">Blog Posts</h1>
-      <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+      <div className="filters-container">
+        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <AuthorFilter 
+          users={users} 
+          selectedAuthor={selectedAuthor} 
+          onAuthorChange={setSelectedAuthor} 
+        />
+      </div>
       
       {filteredPosts.length === 0 ? (
         <div className="no-posts-container">
           <p className="no-posts-message">No posts found</p>
-          {searchTerm && (
+          {(searchTerm || selectedAuthor) && (
             <p className="no-posts-subtitle">
-              Try adjusting your search term: "{searchTerm}"
+              {searchTerm && `Search: "${searchTerm}"`}
+              {searchTerm && selectedAuthor && ' • '}
+              {selectedAuthor && `Author: ${getSelectedAuthorName()}`}
             </p>
           )}
         </div>

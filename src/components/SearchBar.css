@@ -1,5 +1,5 @@
 .search-bar-container {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 .search-input {
@@ -26,3 +26,4 @@
     font-size: 0.9rem;
   }
 }
+

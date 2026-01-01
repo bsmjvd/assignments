@@ -9,6 +9,28 @@
   margin-bottom: 1.5rem;
 }
 
+.filters-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: flex-end;
+}
+
+.filters-container > *:first-child {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+  }
+
+  .filters-container > *:first-child {
+    flex: none;
+  }
+}
+
 .posts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
