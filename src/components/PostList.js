@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PostCard from './PostCard';
+import PostCardSkeleton from './PostCardSkeleton';
 import SearchBar from './SearchBar';
-import Loading from './Loading';
 import AuthorFilter from './AuthorFilter';
 import './PostList.css';
 
@@ -44,7 +44,7 @@ function PostList() {
     fetchData();
   }, []);
 
-   // Filter posts by search term and author
+  // Filter posts by search term and author
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesAuthor = selectedAuthor === '' || post.userId === parseInt(selectedAuthor);
@@ -56,9 +56,12 @@ function PostList() {
     return users.find(user => user.id === userId);
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+  // Get selected author name for display
+  const getSelectedAuthorName = () => {
+    if (!selectedAuthor) return null;
+    const author = users.find(user => user.id === parseInt(selectedAuthor));
+    return author ? author.name : null;
+  };
 
   if (error) {
     return (
@@ -68,13 +71,6 @@ function PostList() {
       </div>
     );
   }
-
-  // Get selected author name for display
-  const getSelectedAuthorName = () => {
-    if (!selectedAuthor) return null;
-    const author = users.find(user => user.id === parseInt(selectedAuthor));
-    return author ? author.name : null;
-  };
 
   return (
     <div className="post-list-container">
@@ -88,7 +84,13 @@ function PostList() {
         />
       </div>
       
-      {filteredPosts.length === 0 ? (
+      {loading ? (
+        <div className="posts-grid">
+          {[...Array(6)].map((_, index) => (
+            <PostCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : filteredPosts.length === 0 ? (
         <div className="no-posts-container">
           <p className="no-posts-message">No posts found</p>
           {(searchTerm || selectedAuthor) && (
@@ -115,3 +117,4 @@ function PostList() {
 }
 
 export default PostList;
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import Loading from './Loading';
+import PostDetailSkeleton from './PostDetailSkeleton';
 import CommentList from './CommentList';
 import './PostDetail.css';
 
@@ -51,7 +51,7 @@ function PostDetail() {
   }, [id]);
 
   if (loading) {
-    return <Loading />;
+    return <PostDetailSkeleton />;
   }
 
   if (error || !post) {
@@ -98,3 +98,4 @@ function PostDetail() {
 }
 
 export default PostDetail;
+
