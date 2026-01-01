@@ -31,10 +31,31 @@
   }
 }
 
+.posts-content-wrapper {
+  position: relative;
+  min-height: 800px;
+}
+
+.posts-content {
+  position: relative;
+  width: 100%;
+  min-height: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+.posts-content.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
 .posts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  flex: 1;
 }
 
 .error-container {

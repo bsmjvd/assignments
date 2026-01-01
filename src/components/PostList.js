@@ -3,7 +3,11 @@ import PostCard from './PostCard';
 import PostCardSkeleton from './PostCardSkeleton';
 import SearchBar from './SearchBar';
 import AuthorFilter from './AuthorFilter';
+import Pagination from './Pagination';
+import PaginationSkeleton from './PaginationSkeleton';
 import './PostList.css';
+
+const POSTS_PER_PAGE = 10;
 
 function PostList() {
   const [posts, setPosts] = useState([]);
@@ -12,6 +16,8 @@ function PostList() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAuthor, setSelectedAuthor] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   useEffect(() => {
     // Fetch posts and users
@@ -51,6 +57,34 @@ function PostList() {
     return matchesSearch && matchesAuthor;
   });
 
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedAuthor]);
+
+  // Ensure current page is within bounds
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
+  // Handle page change with loading state
+  const handlePageChange = (newPage) => {
+    setIsPageLoading(true);
+    // Small delay to show skeleton loading
+    setTimeout(() => {
+      setCurrentPage(newPage);
+      setIsPageLoading(false);
+    }, 300);
+  };
+
   // Get user by ID
   const getUserById = (userId) => {
     return users.find(user => user.id === userId);
@@ -85,11 +119,14 @@ function PostList() {
       </div>
       
       {loading ? (
-        <div className="posts-grid">
-          {[...Array(6)].map((_, index) => (
-            <PostCardSkeleton key={index} />
-          ))}
-        </div>
+        <>
+          <div className="posts-grid">
+            {[...Array(6)].map((_, index) => (
+              <PostCardSkeleton key={index} />
+            ))}
+          </div>
+          <PaginationSkeleton />
+        </>
       ) : filteredPosts.length === 0 ? (
         <div className="no-posts-container">
           <p className="no-posts-message">No posts found</p>
@@ -102,14 +139,37 @@ function PostList() {
           )}
         </div>
       ) : (
-        <div className="posts-grid">
-          {filteredPosts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              author={getUserById(post.userId)}
-            />
-          ))}
+        <div className="posts-content-wrapper">
+          <div className={`posts-content ${isPageLoading ? 'loading' : ''}`}>
+            {isPageLoading && (
+              <>
+                <div className="posts-grid">
+                  {[...Array(POSTS_PER_PAGE)].map((_, index) => (
+                    <PostCardSkeleton key={`skeleton-${index}`} />
+                  ))}
+                </div>
+                <PaginationSkeleton />
+              </>
+            )}
+            {!isPageLoading && (
+              <>
+                <div className="posts-grid">
+                  {paginatedPosts.map(post => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      author={getUserById(post.userId)}
+                    />
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
